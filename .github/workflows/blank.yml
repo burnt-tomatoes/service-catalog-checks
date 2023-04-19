@@ -1,8 +1,7 @@
-
 name: Service Catalog Basic Check
 on:
   repository_dispatch:
-    event_type: ["check"]
+    types: ["check"]
 
 jobs:
   build:
