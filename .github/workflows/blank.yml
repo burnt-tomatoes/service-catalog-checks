@@ -8,12 +8,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10' 
-      - run: python post-result.py
-        env:
-          PAYLOAD: ${{ github.event.client_payload }}
-          SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+    - run: python post-result.py
+      env:
+        PAYLOAD: ${{ github.event.client_payload }}
+        SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
       
