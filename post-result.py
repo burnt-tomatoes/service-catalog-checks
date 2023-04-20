@@ -9,7 +9,10 @@ payload = base64.b64decode(payload).decode('utf-8')
 payload = json.loads(payload)
 print("Received payload of:", payload)
 url = payload["server"]["url"] + payload["server"]["endpoint"]
-data = {"result": "pass"}
+if payload["check"]["slug"] == "nope":
+  data = {"result": "fail"}
+else:
+  data = {"result": "pass"}
 headers = {"Authorization": f"Token {token}"}
 print("Calling", url, "with", data)
 res = requests.patch(url, data, headers=headers)
