@@ -7,6 +7,7 @@ token = os.getenv("SERVICE_CATALOG_TOKEN")
 payload = os.getenv("PAYLOAD")
 payload = base64.b64decode(payload).decode('utf-8')
 payload = json.loads(payload)
+print("Received payload of:", payload)
 url = payload["server"]["url"] + payload["server"]["endpoint"]
 data = {"result": "pass"}
 headers = {"Authorization": f"Token {token}"}
