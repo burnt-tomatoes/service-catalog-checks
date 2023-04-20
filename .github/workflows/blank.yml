@@ -1,4 +1,5 @@
 name: Service Catalog Basic Check
+run-name: Catalog check ${{ github.event.client_payload.check }} on ${{ github.event.client_payload.service }}
 on:
   repository_dispatch:
     types: ["check"]
