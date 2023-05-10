@@ -1,0 +1,53 @@
+name: Service Catalog Basic Check
+run-name: Catalog check ${{ github.event.client_payload.check }} on ${{ github.event.client_payload.service }}
+on:
+  repository_dispatch:
+    types: ["check"]
+
+jobs:
+  log4j:
+    env:
+      SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
+    if: github.event.client_payload.check == 'log4j'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.client_payload.repository }}
+    - run: |
+        wget https://github.com/google/log4jscanner/releases/download/v0.5.0/log4jscanner-v0.5.0-linux-amd64.tar.gz
+        tar -zxf log4jscanner-v0.5.0-linux-amd64.tar.gz
+        cd log4jscanner
+        ./log4jscanner $GITHUB_WORKSPACE >> /tmp/log4j.results
+        if test -s "/tmp/log4j.results"; then
+          contents=$(cat /tmp/log4j.results)
+          echo "::error::Vulnerable files found"
+          printf '{"result": "fail", "message": "Vulnerable file(s) found: `%s`"}' $contents >> /tmp/service-catalog-result.json
+        else
+          echo "::notice::All good, no vulnerable files found"
+          printf '{"result": "pass"}' >> /tmp/service-catalog-result.json
+        fi
+        echo `cat /tmp/service-catalog-result.json`
+    - uses: clearwind-ca/send-result@inputs
+        
+
+  codeowners:
+    env:
+      SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
+    if: github.event.client_payload.check == 'codeowners-check'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.client_payload.repository }}
+    - uses: mszostok/codeowners-validator@v0.7.4
+      with:
+        checks: "files,duppatterns,syntax"
+    - if: success()
+      uses: clearwind-ca/send-result@inputs
+      with:
+        result: "pass"
+    - if: failure()
+      uses: clearwind-ca/send-result@inputs
+      with:
+        result: "fail"
