@@ -17,6 +17,10 @@ jobs:
     - run: |
         python check-metadata.py
     - uses: clearwind-ca/send-result@main
+    - if: failure()
+      uses: clearwind-ca/send-result@inputs
+      with:
+        result: "error"
     
   log4j:
     env:
