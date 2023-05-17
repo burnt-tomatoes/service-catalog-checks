@@ -5,6 +5,19 @@ on:
     types: ["check"]
 
 jobs:
+  meta:
+    env:
+      SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
+    if: github.event.client_payload.check == 'meta-data-urls'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: clearwind-ca/get-payload@main
+    - uses: actions/setup-python@v4
+    - uses: actions/checkout@v3
+    - run: |
+        python check-metadata.py
+    - uses: clearwind-ca/send-result@main
+    
   log4j:
     env:
       SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
