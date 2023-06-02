@@ -1,0 +1,26 @@
+name: CodeOwners check
+run-name: Catalog check ${{ github.event.client_payload.check }} on ${{ github.event.client_payload.service }}
+on:
+  workflow_dispatch:
+
+jobs:
+  codeowners:
+    env:
+      SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
+    if: github.event.client_payload.check == 'codeowners-check'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.client_payload.repository }}
+    - uses: mszostok/codeowners-validator@v0.7.4
+      with:
+        checks: "files,duppatterns,syntax"
+    - if: success()
+      uses: clearwind-ca/send-result@inputs
+      with:
+        result: "pass"
+    - if: failure()
+      uses: clearwind-ca/send-result@inputs
+      with:
+        result: "fail"
