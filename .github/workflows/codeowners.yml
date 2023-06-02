@@ -2,6 +2,9 @@ name: CodeOwners check
 run-name: Catalog check ${{ github.event.client_payload.check }} on ${{ github.event.client_payload.service }}
 on:
   workflow_dispatch:
+    inputs:
+      check:
+        required: true
 
 jobs:
   codeowners:
