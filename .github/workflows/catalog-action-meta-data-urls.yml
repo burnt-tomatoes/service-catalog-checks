@@ -1,0 +1,23 @@
+name: Catalog Check - Meta data URLs
+run-name: Catalog check ${{ github.event.client_payload.check }} on ${{ github.event.client_payload.service }}
+on:
+  repository_dispatch:
+    types: [meta-data-urls]
+
+jobs:
+  meta:
+    # This assumes that the service catalog token is a secret that has been added and is available to this repository.
+    env:
+      SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+    
+    # Extract the payload from the event.
+    - uses: clearwind-ca/get-payload@main
+
+    # Do something here with the payload sent from the catalog server.
+    # You will find the JSON at /tmp/service-catalog-payload.json
+    # You will find the catalog.json inside the JSON with the key `catalog.json`
+    
+    # Send the result back to the server.
+    - uses: clearwind-ca/send-result@main
