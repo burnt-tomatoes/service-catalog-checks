@@ -1,0 +1,30 @@
+name: Service Catalog Log 4J Check
+run-name: Catalog check ${{ github.event.client_payload.check }} on ${{ github.event.client_payload.service }}
+on:
+  repository_dispatch:
+    types: ["log4j-vulnerability"]
+
+jobs:
+  log4j:
+    env:
+      SERVICE_CATALOG_TOKEN: ${{ secrets.SERVICE_CATALOG_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.client_payload.repository }}
+    - run: |
+        wget https://github.com/google/log4jscanner/releases/download/v0.5.0/log4jscanner-v0.5.0-linux-amd64.tar.gz
+        tar -zxf log4jscanner-v0.5.0-linux-amd64.tar.gz
+        cd log4jscanner
+        ./log4jscanner $GITHUB_WORKSPACE >> /tmp/log4j.results
+        if test -s "/tmp/log4j.results"; then
+          contents=$(cat /tmp/log4j.results)
+          echo "::error::Vulnerable files found"
+          printf '{"result": "fail", "message": "Vulnerable file(s) found: `%s`"}' $contents >> /tmp/service-catalog-result.json
+        else
+          echo "::notice::All good, no vulnerable files found"
+          printf '{"result": "pass"}' >> /tmp/service-catalog-result.json
+        fi
+        echo `cat /tmp/service-catalog-result.json`
+    - uses: clearwind-ca/send-result@inputs
